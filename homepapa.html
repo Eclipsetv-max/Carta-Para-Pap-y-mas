@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Para mi Papá 💙</title>
+
+  <!-- Licencia personalizada -->
+  <script src="licencia.js"></script>
+
+  <style>
+@import url(https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap);
+
+body {
+  font-family: "Quicksand", sans-serif;
+  background: linear-gradient(to bottom right, #001F3F, #004080, #1A237E);
+  color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+/* --- Cronómetro y botón --- */
+#cronometro {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  font-size: 1.3rem;
+  color: #ffd700;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 8px 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+  z-index: 9999;
+}
+
+#boton-final {
+  position: fixed;
+  bottom: 15px;
+  left: 15px;
+  font-size: 1rem;
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  display: none;
+  z-index: 10000;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+#boton-final:hover {
+  background-color: #1565c0;
+}
+
+/* --- Estrellas flotantes --- */
+.star {
+  position: fixed;
+  bottom: -10px;
+  color: #ffd700;
+  font-size: 18px;
+  animation: float 6s linear infinite;
+  opacity: 0.9;
+}
+@keyframes float {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+}
+
+/* --- Sobre --- */
+.envelope {
+  --duration: 1000ms;
+  --envelope-width: 300px;
+  --envelope-height: 175px;
+  --envelope-clr-bg: #1565c0;
+  --envelope-clr-bg-side: #0d47a1;
+  --envelope-clr-bg-bottom: #1976d2;
+  --envelope-clr-bg-top: #1565c0;
+  --envelope-clr-txt: #fff;
+  --letter-clr-bg: #fff;
+  --letter-clr-text: #0d47a1;
+  --letter-font-size: 1rem;
+  --letter-delay: 0ms;
+  --letter-delay-hover: calc(var(--duration) * 1.25);
+  --letter-height: calc(var(--envelope-height) - 2rem);
+  --letter-height-hover: calc(var(--envelope-height) * 1.75);
+  --fold-rotate: rotateX(0deg);
+  --fold-zindex-hover: 0;
+  --fold-rotate-hover: rotateX(180deg);
+  --fold-delay: calc(var(--duration) / 2);
+  --fold-delay-hover: calc(var(--duration) * .75);
+  --front-font-size: 1rem;
+
+  position: relative;
+  height: var(--envelope-height);
+  width: var(--envelope-width);
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+@media (min-width: 720px) {
+  .envelope {
+    --envelope-width: 600px;
+    --envelope-height: 350px;
+    --letter-font-size: 1.6rem;
+    --front-font-size: 1.25rem;
+  }
+}
+
+.envelope::after {
+  content: "";
+  position: absolute;
+  top: 110%;
+  left: 50%;
+  width: calc(var(--envelope-width) * 0.85);
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 0, 50, 0.4);
+  filter: blur(15px);
+  transform: translateX(-50%);
+  transition: var(--duration) ease-in-out;
+}
+
+.envelope:hover {
+  --envelope-transform: rotateY(180deg);
+  --fold-rotate: var(--fold-rotate-hover);
+  --fold-delay: var(--fold-delay-hover);
+  --fold-zindex: var(--fold-zindex-hover);
+  --letter-height: var(--letter-height-hover);
+  --letter-delay: var(--letter-delay-hover);
+}
+
+.envelope-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: var(--duration) ease-in-out;
+  transform-style: preserve-3d;
+  transform: var(--envelope-transform);
+  display: grid;
+}
+
+.envelope-front, .envelope-back {
+  grid-area: 1/1;
+  width: 100%;
+  height: 100%;
+  background-color: var(--envelope-clr-bg);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.envelope-front {
+  display: grid;
+  place-content: center;
+  color: var(--envelope-clr-txt);
+}
+.envelope-front .address {
+  text-align: left;
+  font-size: var(--front-font-size);
+}
+.envelope-front .address > p > span:first-child {
+  font-family: system-ui;
+  font-weight: 200;
+}
+.envelope-front .address > p > span:last-of-type {
+  font-weight: 800;
+}
+
+.envelope-back {
+  transform: rotateY(180deg);
+}
+.envelope-back .top-fold {
+  position: absolute;
+  inset: 0;
+  z-index: var(--fold-zindex, 10);
+  background-color: var(--envelope-clr-bg-top);
+  clip-path: polygon(0% 0%, 50% 55%, 100% 0%);
+  transform: var(--fold-rotate);
+  transform-origin: top;
+  transition: var(--duration) ease-in-out;
+  transition-delay: var(--fold-delay);
+}
+
+/* --- Carta interior --- */
+.letter {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 90%;
+  height: var(--letter-height);
+  font-size: var(--letter-font-size);
+  transform: translateX(-50%);
+  background: var(--letter-clr-bg);
+  z-index: 2;
+  padding: 3.5em 3em 2em 3em;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  text-align: center;
+  transition: var(--duration) ease-in-out;
+  transition-delay: var(--letter-delay);
+  overflow: hidden;
+  border-radius: 10px;
+}
+.letter p {
+  margin: 0;
+  font-weight: bold;
+  width: 32ch;
+  color: var(--letter-clr-text);
+}
+.highlight {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #1976d2;
+}
+.custom-image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Cronómetro -->
+<div id="cronometro">20</div>
+<button id="boton-final" onclick="window.location.href='2home.html'">Abrir sorpresa 💫</button>
+
+<!-- Música -->
+<audio id="musica" loop>
+  <source src="home.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Estrellas flotantes -->
+<script>
+function crearEstrella() {
+  const star = document.createElement("div");
+  star.classList.add("star");
+  star.style.left = Math.random() * 100 + "vw";
+  star.style.animationDuration = Math.random() * 3 + 3 + "s";
+  star.innerHTML = "⭐";
+  document.body.appendChild(star);
+  setTimeout(() => star.remove(), 6000);
+}
+setInterval(crearEstrella, 400);
+</script>
+
+<!-- Sobre -->
+<div class="envelope" id="sobre">
+  <div class="envelope-inner">
+    <div class="envelope-front">
+      <div class="address">
+        <p><span>Para:</span> <span>Mi Papá Querido 💙</span></p>
+        <p><span>De:</span> <span>Tu Hijo que te admira 🌟</span></p>
+      </div>
+    </div>
+
+    <div class="envelope-back">
+      <div class="top-fold"></div>
+      <div class="letter">
+        <img src="https://cdn-icons-png.flaticon.com/512/2721/2721304.png" alt="estrella" class="custom-image">
+        <p>
+          Papá, gracias por ser mi fuerza, mi guía y mi héroe.  
+          Cada consejo y abrazo tuyo son un tesoro.  
+          Te admiro con todo mi corazón y  
+          <span class="highlight">siempre serás mi ejemplo a seguir 💙</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Música -->
+<script>
+const sobre = document.getElementById('sobre');
+const musica = document.getElementById('musica');
+
+function reproducirMusica() {
+  musica.play().catch(() => console.log("Esperando interacción..."));
+}
+sobre.addEventListener('mouseenter', reproducirMusica);
+sobre.addEventListener('click', reproducirMusica);
+</script>
+
+<!-- Cronómetro -->
+<script>
+let tiempo = 20;
+const cronometro = document.getElementById("cronometro");
+const botonFinal = document.getElementById("boton-final");
+
+const intervalo = setInterval(() => {
+  tiempo--;
+  cronometro.textContent = tiempo;
+  if (tiempo <= 0) {
+    clearInterval(intervalo);
+    cronometro.style.display = "none";
+    botonFinal.style.display = "block";
+  }
+}, 1000);
+</script>
+
+<!-- Bloqueo básico -->
+<script>
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (e.key === 'F12') e.preventDefault();
+  if (e.ctrlKey && e.shiftKey && e.key === 'I') e.preventDefault();
+  if (e.ctrlKey && e.key === 'u') e.preventDefault();
+});
+</script>
+</body>
+</html>

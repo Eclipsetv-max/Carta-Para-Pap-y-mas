@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Sorpresa 💙</title>
+<style>
+body {
+  margin:0;
+  height:100vh;
+  font-family:"Quicksand", sans-serif;
+  overflow:hidden;
+  background:linear-gradient(to bottom right,#e3f2fd,#bbdefb,#90caf9);
+}
+/* Línea de puntos */
+.linea-con-puntos{
+  position:relative;
+  width:240px;
+  height:50px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:auto;
+  top:50px;
+}
+.linea{
+  position:absolute;
+  top:50%;
+  left:0;
+  right:0;
+  height:3px;
+  background-color:#64b5f6;
+  transform:translateY(-50%);
+  border-radius:2px;
+  z-index:0;
+}
+.punto{
+  width:25px;
+  height:25px;
+  border-radius:50%;
+  border:3px solid #1565c0;
+  background:white;
+  z-index:1;
+  transition:background-color 0.5s ease;
+}
+.punto.activo{background:#1565c0;}
+.corazon{
+  position:absolute;
+  top:50%;
+  left:0%;
+  transform:translate(-50%,-50%);
+  font-size:28px;
+  transition:left 1.5s ease-in-out;
+  z-index:2;
+}
+.mensaje{
+  margin-top:120px;
+  font-size:1.8rem;
+  color:#0d47a1;
+  font-weight:bold;
+  opacity:0;
+  transition:opacity 1s ease;
+  text-align:center;
+}
+
+/* Máquina y tarjeta */
+.maquina{
+  position:fixed;
+  top:40%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:200px;
+  height:120px;
+  background:linear-gradient(145deg,#1e3a8a,#111827);
+  border:3px solid #90caf9;
+  border-radius:15px;
+  box-shadow:inset 0 0 20px rgba(255,255,255,0.2);
+  display:none;
+  z-index:9998;
+}
+.ranura{
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:160px;
+  height:20px;
+  background:#000;
+  transform:translate(-50%,-50%);
+  border-radius:4px;
+  box-shadow:inset 0 0 10px rgba(255,255,255,0.3);
+}
+.instruccion{
+  position:fixed;
+  bottom:40px;
+  color:#0d47a1;
+  font-size:1.2rem;
+  font-weight:bold;
+  opacity:0;
+  transition:opacity 0.5s ease;
+}
+.tarjeta{
+  position:fixed;
+  bottom:120px;
+  left:50%;
+  transform:translateX(-50%) translateY(50px);
+  font-size:4rem;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:grab;
+  z-index:10001;
+  user-select:none;
+  transition:transform 0.5s ease,opacity 0.5s ease;
+  opacity:0;
+}
+.tarjeta.visible{transform:translateX(-50%) translateY(0);opacity:1;}
+.tarjeta:active{cursor:grabbing;transform:translateX(-50%) scale(1.1);}
+.insertado{animation:insertar 1s ease forwards;}
+@keyframes insertar{
+  0%{transform:translate(-50%,-50%) scale(1);opacity:1;}
+  100%{transform:translate(-50%,-50%) scale(0.8);opacity:0;}
+}
+
+/* Pantalla final */
+#finalScreen{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  z-index:10002;
+  overflow:hidden;
+}
+#corazonFinal{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  display:none;
+  z-index:10003;
+}
+#latido{
+  font-size:5rem;
+  animation:latido 1s infinite;
+}
+#mensajeFinal{
+  color:white;
+  font-size:2rem;
+  margin-top:20px;
+  font-weight:bold;
+}
+@keyframes latido{
+  0%,100%{transform:scale(1);}
+  25%,75%{transform:scale(1.2);}
+  50%{transform:scale(1);}
+}
+.estrellaFugaz{
+  position:absolute;
+  width:2px;
+  height:2px;
+  background:white;
+  border-radius:50%;
+  opacity:0.9;
+  box-shadow:0 0 6px white;
+}
+#meteorito{
+  position:absolute;
+  width:80px;
+  height:80px;
+  background:radial-gradient(circle at 30% 30%, #fbc02d, #f57f17);
+  border-radius:50%;
+  top:-150px;
+  left:50%;
+  transform:translateX(-50%) scale(1);
+  display:none;
+  z-index:10004;
+  box-shadow:0 0 30px gold,0 0 60px yellow;
+  cursor:pointer;
+}
+/* Texto arriba del meteorito */
+#textoSol{
+  position:absolute;
+  top:15%;
+  left:50%;
+  transform:translateX(-50%);
+  color:#fff59d;
+  font-size:1.8rem;
+  text-shadow:0 0 10px gold,0 0 20px #fff176;
+  opacity:0;
+  transition:opacity 1s ease;
+  z-index:10005;
+}
+#textoSol.visible{
+  opacity:1;
+  animation:parpadeo 1.5s infinite;
+}
+@keyframes parpadeo{
+  0%,100%{opacity:1;}
+  50%{opacity:0.5;}
+}
+</style>
+</head>
+<body>
+
+<!-- Música -->
+<audio id="musicaFondo" src="home2.mp3" preload="auto"></audio>
+
+<!-- Línea inicial -->
+<div class="linea-con-puntos" id="animacion">
+  <div class="linea"></div>
+  <div class="punto activo" id="p1"></div>
+  <div class="punto" id="p2"></div>
+  <div class="punto" id="p3"></div>
+  <div class="corazon" id="corazon">💙</div>
+</div>
+<div class="mensaje" id="mensaje">Te amo papá 💙</div>
+
+<!-- Máquina y tarjeta -->
+<div class="maquina" id="maquina"><div class="ranura"></div></div>
+<div class="tarjeta" id="tarjeta">💳</div>
+<div class="instruccion" id="instruccion">⬆️ Mueva la tarjeta hacia la máquina para ingresar</div>
+
+<!-- Pantalla final -->
+<div id="finalScreen">
+  <div id="corazonFinal">
+    <div id="latido">💙</div>
+    <div id="mensajeFinal">Te quiero mucho papá 💙</div>
+  </div>
+  <div id="textoSol">🌞 ¡Aprieta el sol para continuar!</div>
+</div>
+<div id="meteorito"></div>
+
+<script>
+const corazon=document.getElementById('corazon');
+const p2=document.getElementById('p2');
+const mensaje=document.getElementById('mensaje');
+const maquina=document.getElementById('maquina');
+const tarjeta=document.getElementById('tarjeta');
+const instruccion=document.getElementById('instruccion');
+const finalScreen=document.getElementById('finalScreen');
+const corazonFinal=document.getElementById('corazonFinal');
+const meteorito=document.getElementById('meteorito');
+const musica=document.getElementById('musicaFondo');
+const textoSol=document.getElementById('textoSol');
+
+// Música al clic
+function activarMusica(){
+  musica.play().catch(e=>console.log("Bloqueado:",e));
+  document.removeEventListener('click',activarMusica);
+  document.removeEventListener('touchstart',activarMusica);
+}
+document.addEventListener('click',activarMusica);
+document.addEventListener('touchstart',activarMusica);
+
+// Animación inicial
+setTimeout(()=>{
+  corazon.style.left="50%";
+  p2.classList.add('activo');
+  setTimeout(()=>{
+    mensaje.style.opacity=1;
+    setTimeout(()=>{
+      document.getElementById('animacion').style.display='none';
+      mensaje.style.display='none';
+      maquina.style.display='block';
+      setTimeout(()=>{
+        tarjeta.style.display='flex';
+        setTimeout(()=>tarjeta.classList.add('visible'),50);
+        setTimeout(()=>instruccion.style.opacity=1,500);
+      },1000);
+    },2500);
+  },1500);
+},1500);
+
+// Movimiento compatible (mouse + touch)
+let dragging=false;
+function iniciarArrastre(e){ dragging=true; e.preventDefault(); }
+function detenerArrastre(){ dragging=false; }
+function mover(e){
+  if(!dragging) return;
+  let x = e.touches ? e.touches[0].pageX : e.pageX;
+  let y = e.touches ? e.touches[0].pageY : e.pageY;
+  tarjeta.style.left=x+'px';
+  tarjeta.style.top=y+'px';
+
+  const rectT=tarjeta.getBoundingClientRect();
+  const rectM=maquina.getBoundingClientRect();
+  if(rectT.left<rectM.right && rectT.right>rectM.left && rectT.top<rectM.bottom && rectT.bottom>rectM.top){
+    dragging=false;
+    tarjeta.style.display='none';
+    instruccion.style.display='none';
+    setTimeout(()=>iniciarFinal(),1000);
+  }
+}
+tarjeta.addEventListener('mousedown',iniciarArrastre);
+tarjeta.addEventListener('touchstart',iniciarArrastre,{passive:false});
+document.addEventListener('mouseup',detenerArrastre);
+document.addEventListener('touchend',detenerArrastre);
+document.addEventListener('mousemove',mover);
+document.addEventListener('touchmove',mover,{passive:false});
+
+// Pantalla final
+function iniciarFinal(){
+  finalScreen.style.display='block';
+  corazonFinal.style.display='block';
+  // Estrellas fugaces
+  for(let i=0;i<30;i++){
+    const estrella=document.createElement('div');
+    estrella.classList.add('estrellaFugaz');
+    estrella.style.left=Math.random()*window.innerWidth+'px';
+    estrella.style.top='-10px';
+    finalScreen.appendChild(estrella);
+    const dur=1000+Math.random()*1000;
+    const offsetX=(Math.random()*300)-150;
+    const offsetY=window.innerHeight+20;
+    estrella.animate([
+      {transform:'translate(0,0)',opacity:1},
+      {transform:`translate(${offsetX}px,${offsetY}px)`,opacity:0}
+    ],{duration:dur,iterations:Infinity,easing:'ease-in'});
+  }
+
+  // Meteorito
+  setTimeout(()=>{
+    corazonFinal.style.display='none';
+    meteorito.style.display='block';
+    textoSol.classList.add('visible'); // Muestra texto
+    meteorito.animate([
+      {top:'-150px',transform:'translateX(-50%) rotate(0deg) scale(1)'},
+      {top:'60%',transform:'translateX(-50%) rotate(720deg) scale(1.2)'}
+    ],{duration:2000,easing:'ease-in-out',fill:'forwards'});
+    meteorito.addEventListener('click',()=>{
+      textoSol.classList.remove('visible');
+      window.location.href='3home.html';
+    });
+  },8000);
+}
+</script>
+</body>
+</html>
